@@ -293,23 +293,38 @@ static SensorsAnalyticsSDK *sharedInstance = nil;
         }
         
         if (![self.messageQueue removeFirstRecords:flushSize]) {
-            @throw [NSException exceptionWithName:@"SqliteException"
-                                           reason:@"removeFirstRecords from Message Queue in Sqlite fail"
-                                         userInfo:nil];
+            if (_debugMode != SensorsAnalyticsDebugOff) {
+                @throw [NSException exceptionWithName:@"SqliteException"
+                                               reason:@"removeFirstRecords from Message Queue in Sqlite fail"
+                                             userInfo:nil];
+            } else {
+                SAError(@"removeFirstRecords from Message Queue in Sqlite fail");
+                break;
+            }
         }
         recordArray = [self.messageQueue getFirstRecords:flushSize];
         if (recordArray == nil) {
-            @throw [NSException exceptionWithName:@"SqliteException"
-                                           reason:@"getFirstRecords from Message Queue in Sqlite fail"
-                                         userInfo:nil];
+            if (_debugMode != SensorsAnalyticsDebugOff) {
+                @throw [NSException exceptionWithName:@"SqliteException"
+                                               reason:@"getFirstRecords from Message Queue in Sqlite fail"
+                                             userInfo:nil];
+            } else {
+                SAError(@"getFirstRecords from Message Queue in Sqlite fail");
+                break;
+            }
         }
         SADebug(@"flush one batch success, currentCount is %lu", [self.messageQueue count]);
     }
     
     if (![self.messageQueue vacuum]) {
-        @throw [NSException exceptionWithName:@"SqliteException"
-                                       reason:@"vacuum in Message Queue in Sqlite fail"
-                                     userInfo:nil];
+        if (_debugMode != SensorsAnalyticsDebugOff) {
+            @throw [NSException exceptionWithName:@"SqliteException"
+                                           reason:@"vacuum in Message Queue in Sqlite fail"
+                                         userInfo:nil];
+        } else {
+            SAError(@"vacuum in Message Queue in Sqlite fail");
+            return;
+        }
     }
     
     _lastFlushTime = [[self class] getCurrentTime];
