@@ -58,6 +58,7 @@
         _open = NO;
         _connected = NO;
         _sessionEnded = NO;
+        _useGzip = NO;
         _session = [[NSMutableDictionary alloc] init];
         _url = url;
         _connectCallback = connectCallback;
@@ -147,8 +148,9 @@
 
 - (void)sendMessage:(id<SADesignerMessage>)message {
     if (_connected) {
-        NSString *jsonString = [[NSString alloc] initWithData:[message JSONData] encoding:NSUTF8StringEncoding];
-        SADebug(@"%@ VTrack sending message: %@", self, [message description]);
+    
+        NSString *jsonString = [[NSString alloc] initWithData:[message JSONData:_useGzip] encoding:NSUTF8StringEncoding];
+//        SADebug(@"%@ VTrack sending message: %@", self, [message description]);
         [_webSocket send:jsonString];
     } else {
         SALog(@"Not sending message as we are not connected: %@", [message debugDescription]);
@@ -161,7 +163,7 @@
     id <SADesignerMessage> designerMessage = nil;
 
     NSData *jsonData = [message isKindOfClass:[NSString class]] ? [(NSString *)message dataUsingEncoding:NSUTF8StringEncoding] : message;
-    SADebug(@"%@ VTrack received message: %@", self, [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
+//    SADebug(@"%@ VTrack received message: %@", self, [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
     
     NSError *error = nil;
     id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
