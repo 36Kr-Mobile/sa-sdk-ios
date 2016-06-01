@@ -325,10 +325,11 @@ static SensorsAnalyticsSDK *sharedInstance = nil;
                     SALog(@"%@ invalid message: %@", self, jsonString);
                     SALog(@"%@ ret_code: %ld", self, [urlResponse statusCode]);
                     SALog(@"%@ ret_content: %@", self, urlResponseContent);
-                    
-                    @throw [SensorsAnalyticsDebugException exceptionWithName:@"IllegalDataException"
-                                                                      reason:errMsg
-                                                                    userInfo:nil];
+                    if (!self.ignoreFlushException) {
+                        @throw [SensorsAnalyticsDebugException exceptionWithName:@"IllegalDataException"
+                                                                          reason:errMsg
+                                                                        userInfo:nil];
+                    }
                 } else {
                     SAError(@"%@", errMsg);
                     flushSucc = NO;
@@ -448,9 +449,11 @@ static SensorsAnalyticsSDK *sharedInstance = nil;
         [self flushByType:@"SFSafariViewController" withSize:(_debugMode == SensorsAnalyticsDebugOff ? 50 : 1) andFlushMethod:flushBySafariVC];
         
         if (![self.messageQueue vacuum]) {
-            @throw [NSException exceptionWithName:@"SqliteException"
-                                           reason:@"vacuum in Message Queue in Sqlite fail"
-                                         userInfo:nil];
+            if (!self.ignoreFlushException) {
+                @throw [NSException exceptionWithName:@"SqliteException"
+                                               reason:@"vacuum in Message Queue in Sqlite fail"
+                                             userInfo:nil];
+            }
         }
     });
 }

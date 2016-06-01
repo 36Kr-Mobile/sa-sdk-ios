@@ -135,6 +135,11 @@ typedef NS_ENUM(NSInteger, SensorsAnalyticsDebugMode) {
  */
 @property (atomic) UInt32 vtrackWindowIndex;
 
+
+
+
+@property (nonatomic, assign) BOOL ignoreFlushException;
+
 /**
  * @abstract
  * 根据传入的配置，初始化并返回一个<code>SensorsAnalyticsSDK</code>的单例
